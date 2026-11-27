@@ -1,0 +1,25 @@
+{
+  "name": "CleanDrop IL",
+  "short_name": "CleanDrop",
+  "description": "שירות הוצאת זבל מדלת הבית | خدمة إخراج النفايات | Вынос мусора от двери в Израиле",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F4FBF8",
+  "theme_color": "#0F766E",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

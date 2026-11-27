@@ -1,0 +1,78 @@
+name: Build Signed Android APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Generate release keystore
+        run: |
+          keytool -genkeypair -v \
+            -keystore /tmp/cleandrop-release.jks \
+            -alias cleandrop \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass cleandrop2026 -keypass cleandrop2026 \
+            -dname "CN=CleanDrop IL, OU=Mobile, O=CleanDrop, L=Tel Aviv, C=IL"
+
+      - name: Build signed release APK
+        working-directory: android-app
+        env:
+          KEYSTORE_PATH: /tmp/cleandrop-release.jks
+          KEYSTORE_PASSWORD: cleandrop2026
+          KEY_ALIAS: cleandrop
+          KEY_PASSWORD: cleandrop2026
+        run: gradle assembleRelease --no-daemon
+
+      - name: Verify and package APK
+        run: |
+          cp android-app/app/build/outputs/apk/release/app-release.apk CleanDrop-IL-v1.0.0.apk
+          ls -lh CleanDrop-IL-v1.0.0.apk
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner 2>/dev/null | sort -V | tail -n 1 || true)
+          if [ -n "$APKSIGNER" ]; then
+            "$APKSIGNER" verify --verbose CleanDrop-IL-v1.0.0.apk
+          else
+            echo "apksigner not found in PATH, checking APK zip contents"
+            unzip -l CleanDrop-IL-v1.0.0.apk | head -n 30
+          fi
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CleanDrop-IL-v1.0.0-apk
+          path: CleanDrop-IL-v1.0.0.apk
+
+      - name: Publish GitHub Release v1.0.0
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view v1.0.0 >/dev/null 2>&1; then
+            gh release upload v1.0.0 CleanDrop-IL-v1.0.0.apk --clobber
+          else
+            gh release create v1.0.0 CleanDrop-IL-v1.0.0.apk \
+              --title "CleanDrop IL v1.0.0" \
+              --notes "Signed Android APK for CleanDrop IL (Tel Aviv / Israel doorstep pickup PWA wrapper)"
+          fi

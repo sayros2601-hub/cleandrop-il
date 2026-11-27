@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "cleandrop-il",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-04-01",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "cleandrop-il-db",
+      "database_id": "aada5909-d909-48de-bdba-952b04f31287"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.CleanDropIL" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/emerald_primary</item>
+        <item name="colorPrimaryVariant">@color/emerald_dark</item>
+        <item name="android:statusBarColor">@color/emerald_primary</item>
+        <item name="android:windowBackground">@color/bg_mint</item>
+    </style>
+</resources>
